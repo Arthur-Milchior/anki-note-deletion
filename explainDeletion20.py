@@ -1,9 +1,22 @@
 # -*- coding: utf-8 -*-
-#Copyright: Arthur Milchior arthur@milchior.fr
-#License: GNU GPL, version 3 or later; http://www.gnu.org/copyleft/gpl.html
-#Feel free to contribute to this code on https://github.com/Arthur-Milchior/anki-note-deletion
-#
+# Copyright: Arthur Milchior arthur@milchior.fr
+# encoding: utf8
+# License: GNU GPL, version 3 or later; http://www.gnu.org/copyleft/gpl.html
+# Feel free to contribute to this code on https://github.com/Arthur-Milchior/anki-note-deletion
+# Add-on number 12287769 https://ankiweb.net/shared/info/12287769
 
+"""delete.txt (in your profile folder) now contains a fourth column stating the reason for the card's deletion. Which method called for the deletion, and why it did it. This is particularly useful when "check database" state that some notes where removed. Now you can now exactly which one.
+
+#Developer's note
+This add-on redefine every methods calling _Collection._remNotes, hence it may be incompatible with addon redefining: _Collection.remCards, _Collection.fixIntegrity, Syncer.remove and AddCards.removeTempNote
+
+
+It also redefines
+_Collection._remNotes
+
+
+Finally, the hook "remNote" is not called anymore when a note is removed
+"""
 
 from anki.hooks import addHook, remHook
 from anki.consts import *
@@ -21,7 +34,7 @@ from threading import Thread
 from send2trash import send2trash
 from aqt.qt import *
 from anki.collection import _Collection
-from anki.utils import  isWin, isMac, intTime, splitFields, ids2str
+from anki.utilsg import  isWin, isMac, intTime, splitFields, ids2str
 from anki.hooks import runHook, addHook
 import aqt
 import aqt.progress
@@ -32,6 +45,22 @@ from aqt.utils import saveGeom, restoreGeom, showInfo, showWarning, \
     restoreState, getOnlyText, askUser, applyStyles, showText, tooltip, \
     openHelp, openLink, checkInvalidFilename, getFile
 import sip
+
+
+def _remNotes(col, ids, reason=""):
+    "Bulk delete notes by ID. Don't call this directly."
+    if not ids:
+        return
+    strids = ids2str(ids)
+    # we need to log these independently of cards, as one side may have
+    # more card templates
+    onRemNotes(col,ids,reason=reason)
+    col._logRem(ids, REM_NOTE)
+    col.db.execute("delete from notes where id in %s" % strids)
+
+_Collection._remNotes=_remNotes
+
+
 
 
 
@@ -55,18 +84,6 @@ def onRemNotes(col, nids, reason=""):
 
 # addHook("remNotes",onRemNotes)
 
-def _remNotes(col, ids, reason=""):
-    "Bulk delete notes by ID. Don't call this directly."
-    if not ids:
-        return
-    strids = ids2str(ids)
-    # we need to log these independently of cards, as one side may have
-    # more card templates
-    onRemNotes(col,ids,reason=reason)
-    col._logRem(ids, REM_NOTE)
-    col.db.execute("delete from notes where id in %s" % strids)
-
-_Collection._remNotes=_remNotes
 
 def remCards(self, ids, notes=True):
     """Bulk delete cards by ID.
