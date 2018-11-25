@@ -7,7 +7,18 @@ you are lucky, and that the deletion was clean enough to be logged.
 However, when you want to know why the problem did occur, you miss two
 important facts. The time of the deletion. And its reason.
 
+Furthermore, the same separator (tab) is used for separating the
+fields's content, and separating the fields content from the main
+column. This does not help readability.
 ## Usage
+
+### Separators
+Instead of tabs, backticks "`" are used to separate the fields of the
+note. And tilde "~" are used to separate the fields from the other
+columns. While both of those symbol may appear in a field, I hope that
+it will be the case less often than the tab.
+
+### All kinds of deletions
 When this add-on is installed, when a note is deleted, it will be
 logged in deleted_long.txt instead of deleted.txt. The reason will be
 logged. Currently, there may be three kinds of reason:
@@ -42,7 +53,7 @@ You may also decide to delete cards, realize that this lead no card
   following cases:
   
 * "Cards {ids} removed because of missing templates." Similar to last
-  case, but instead of a whole not missing, a single template of a
+  case, but instead of a whole note missing, a single template of a
   card is missing.
 * "Deleting cards {cids} because we delete the model {m}". A model is
   being deleted. You probably was warned that it still had some notes,

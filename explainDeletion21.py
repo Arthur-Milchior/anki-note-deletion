@@ -5,25 +5,40 @@
 # Feel free to contribute to this code on https://github.com/Arthur-Milchior/anki-note-deletion
 # Add-on number 12287769 https://ankiweb.net/shared/info/12287769
 
-from anki.collection import _Collection
-from anki.utils import intTime
+import stat
 import datetime
+import os
+from anki.collection import _Collection
+from anki.utils import intTime,ids2str, splitFields
+from anki.consts import REM_CARD, REM_NOTE, MODEL_STD, REM_DECK, MODEL_CLOZE
+from aqt import mw
+from aqt.utils import tooltip
 
-def _remNotes(col, ids, reason=""):
-    "Bulk delete notes by ID. Don't call this directly."
+
+def debug(t):
+    #print(t)
+    pass
+
+def _remNotes(self, ids, reason=""):
+    """Bulk delete notes by ID. Don't call this directly.
+
+    keyword arguments:
+    self -- collection"""
+    debug("_remNotes")
     if not ids:
         return
     strids = ids2str(ids)
     # we need to log these independently of cards, as one side may have
     # more card templates
-    onRemNotes(col,ids,reason=reason)
-    col._logRem(ids, REM_NOTE)
-    col.db.execute("delete from notes where id in %s" % strids)
+    mw.onRemNotes(self,ids,reason=reason)
+    self._logRem(ids, REM_NOTE)
+    self.db.execute("delete from notes where id in %s" % strids)
 
 _Collection._remNotes=_remNotes
 
 from aqt.addcards import AddCards
 def removeTempNote(self, note):
+    debug("removeTempNote")
     if not note or not note.id:
         return
     # we don't have to worry about cards; just the note
@@ -32,6 +47,7 @@ AddCards.removeTempNote=removeTempNote
 
 from anki.sync import Syncer
 def remove(self, graves):
+        debug("remove")
         # pretend to be the server so we don't set usn = -1
         self.col.server = True
 
@@ -47,6 +63,7 @@ def remove(self, graves):
 Syncer.remove=remove
 
 def fixIntegrity(self):
+        debug("fixIntegrity")
         "Fix possible problems and rebuild caches."
         problems = []
         self.save()
@@ -172,6 +189,7 @@ _Collection.fixIntegrity=fixIntegrity
 
 
 def remCards(self, ids, notes=True, reason=None):
+        debug("remCards")
         """Bulk delete cards by ID.
 
         keyword arguments:
@@ -194,6 +212,7 @@ _Collection.remCards=remCards
 
 from anki.models import ModelManager
 def rem(self, m):
+        debug("rem")
         "Delete model, and all its cards/notes."
         self.col.modSchema(check=True)
         current = self.current()['id'] == m['id']
@@ -211,6 +230,7 @@ select id from cards where nid in (select id from notes where mid = ?)""",
 ModelManager.rem = rem
 
 def remTemplate(self, m, template):
+        debug("remTemplate")
         "False if removing template would leave orphan notes."
         assert len(m['tmpls']) > 1
         # find cards using this template
@@ -242,6 +262,7 @@ update cards set ord = ord - 1, usn = ?, mod = ?
 ModelManager.remTemplate=remTemplate
 
 def _changeCards(self, nids, oldModel, newModel, map):
+        debug("_changeCards")
         """Change the note whose ids are nid to the model newModel, reorder
         fields according to map. Write the change in the database
         
@@ -285,6 +306,7 @@ def _changeCards(self, nids, oldModel, newModel, map):
 ModelManager._changeCards=_changeCards
 
 def remNotes(self, ids, reason=None):
+        debug("remNotes")
         """Removes all cards associated to the notes whose id is in ids"""
         self.remCards(self.db.list("select id from cards where nid in "+
                                    ids2str(ids)), reason=reason or f"Removing notes  {ids}")
@@ -292,6 +314,7 @@ _Collection.remNotes=remNotes
 
 from anki.decks import DeckManager
 def rem(self, did, cardsToo=False, childrenToo=True):
+        debug("rem")
         """Remove the deck whose id is did.
 
         Does not delete the default deck, but rename it.
@@ -354,6 +377,7 @@ DeckManager.rem=rem
 
 from aqt.reviewer import Reviewer
 def onDelete(self):
+        debug("onDelete")
         # need to check state because the shortcut is global to the main
         # window
         if self.mw.state != "review" or not self.card:
@@ -371,6 +395,7 @@ Reviewer.onDelete=onDelete
 
 from aqt.browser import Browser
 def _deleteNotes(self):
+        debug("_deleteNotes")
         nids = self.selectedNotes()
         if not nids:
             return
@@ -404,6 +429,7 @@ Browser._deleteNotes = _deleteNotes
 
 from aqt.main import AnkiQt
 def onRemNotes(self, col, nids,reason=""):
+        debug("onRemNotes")
         """Append (reason,deletion time id, deletion time readable, id, model id, fields) to the end of deleted_long.txt
 
         This is done for each id of nids.        
@@ -418,7 +444,9 @@ def onRemNotes(self, col, nids,reason=""):
                     "select id, mid, flds from notes where id in %s" %
                 ids2str(nids)):
                 fields = splitFields(flds)
-                f.write(("\t".join([reason,intTime(),datetime.datetime.now(),str(id), str(mid)] + fields)).encode("utf8"))
+                fields=("`".join(fields)) 
+                f.write(("~".join([reason,str(intTime()),str(datetime.datetime.now()),str(id), str(mid), fields])).encode("utf8"))
                 f.write(b"\n")
 
-AnkiQt.BackupThread.onRemNotes = onRemNotes
+
+AnkiQt.onRemNotes = onRemNotes
