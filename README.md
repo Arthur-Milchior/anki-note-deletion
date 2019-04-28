@@ -2,7 +2,7 @@
 ## Rationale
 Sometime, you have bugs. Card or notes are deleted, and you just don't
 know why. You can find the notes in the file deleted.txt, at least if
-you are lucky, and that the deletion was clean enough to be logged. 
+you are lucky, and that the deletion was clean enough to be logged.
 
 However, when you want to know why the problem did occur, you miss two
 important facts. The time of the deletion. And its reason.
@@ -10,14 +10,10 @@ important facts. The time of the deletion. And its reason.
 Furthermore, the same separator (tab) is used for separating the
 fields's content, and separating the fields content from the main
 column. This does not help readability.
+
+This add-on logs everything in CSV format, which is non-ambiguous (as
+long as you know the note type)
 ## Usage
-
-### Separators
-Instead of tabs, backticks "`" are used to separate the fields of the
-note. And tilde "~" are used to separate the fields from the other
-columns. While both of those symbol may appear in a field, I hope that
-it will be the case less often than the tab.
-
 ### All kinds of deletions
 When this add-on is installed, when a note is deleted, it will be
 logged in deleted_long.txt instead of deleted.txt. The reason will be
@@ -51,7 +47,7 @@ You actually asked to delete a whole not. It can appear in the
 You may also decide to delete cards, realize that this lead no card
   to some note, and thus deleted the note. It may occur in the
   following cases:
-  
+
 * "Cards {ids} removed because of missing templates." Similar to last
   case, but instead of a whole note missing, a single template of a
   card is missing.
@@ -82,15 +78,25 @@ It is highly probable that this add-on will be incompatible with other
 add-ons.  Because it changes a lot of things. Sadly, it seems hard to
 do really better. Please let me know whether you find some problem,
 with which add-on you have those problem.  It means that this add-on
-may be better for debugging purpose than for every day use. I'm not sur.
+may be better for debugging purpose than for every day use. I'm not
+sur.
+
+In particular it is incompatible with add-ons:
+* [Quicker Anki: 802285486](https://ankiweb.net/shared/info/802285486)
+* [Database checker/fixer explained, more fixers 1135180054](https://ankiweb.net/shared/info/1135180054)
+
+Please instead use-addon
+[777545149](https://ankiweb.net/shared/info/777545149) which merges
+those three add-ons
+
 
 ## Internal
 This add-on redefine the following methods:
 * In ```anki.collection```: ```_Collection._remNotes```,
   ```_Collection.fixIntegrity```, ```_Collection.remCards```,
-  ```remNotes```, 
-* In ```aqt.AddCards```: ```AddCards.removeTempNote```, 
-* In ```anki.sync```: ```Syncer.remove```, 
+  ```remNotes```,
+* In ```aqt.AddCards```: ```AddCards.removeTempNote```,
+* In ```anki.sync```: ```Syncer.remove```,
 * In ```anki.models```: ```ModelManager.rem```,
   ```ModelManager.remTemplate```, ```_changeCards```
 * In ```anki.decks```: ```DeckManager.rem```

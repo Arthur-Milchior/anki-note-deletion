@@ -1,3 +1,4 @@
+import csv
 from .debug import debug
 from aqt.addcards import AddCards
 from aqt.utils import tooltip
@@ -13,19 +14,20 @@ def _remNotes(self, ids, reason=""):
 
     keyword arguments:
     self -- collection"""
-    debug("_remNotes")
+    #only difference: adding a reason for deletion, calling onRemNotes
     if not ids:
         return
     strids = ids2str(ids)
     # we need to log these independently of cards, as one side may have
     # more card templates
-    mw.onRemNotes(self,ids,reason=reason)
+    mw.onRemNotes(self,ids,reason=reason)# new
     self._logRem(ids, REM_NOTE)
     self.db.execute("delete from notes where id in %s" % strids)
 
 _Collection._remNotes=_remNotes
 
 def removeTempNote(self, note):
+    #Only difference: adding a reason for deletion (normally it should not be logged anyway)
     debug("removeTempNote")
     if not note or not note.id:
         return
@@ -34,6 +36,7 @@ def removeTempNote(self, note):
 AddCards.removeTempNote=removeTempNote
 
 def remNotes(self, ids, reason=None):
+    #only diff: adding a reason for deletion
         debug("remNotes")
         """Removes all cards associated to the notes whose id is in ids"""
         self.remCards(self.db.list("select id from cards where nid in "+
@@ -42,6 +45,7 @@ _Collection.remNotes=remNotes
 
 from aqt.reviewer import Reviewer
 def onDelete(self):
+    # only diff: adding a reason for deletion
         debug("onDelete")
         # need to check state because the shortcut is global to the main
         # window
@@ -60,7 +64,7 @@ Reviewer.onDelete=onDelete
 
 from aqt.browser import Browser
 def _deleteNotes(self):
-        debug("_deleteNotes")
+    # only diff: adding reason
         nids = self.selectedNotes()
         if not nids:
             return
@@ -102,16 +106,14 @@ def onRemNotes(self, col, nids, reason=""):
         """
         path = os.path.join(self.pm.profileFolder(), "deleted_long.txt")
         existed = os.path.exists(path)
-        with open(path, "ab") as f:
+        with open(path, "a") as f:
             if not existed:
                 f.write(b"reason\tdeletion time id\thuman deletion time\tid\tmid\tfields\t\n")
             for id, mid, flds in col.db.execute(
                     "select id, mid, flds from notes where id in %s" %
                 ids2str(nids)):
                 fields = splitFields(flds)
-                fields=("`".join(fields))
-                f.write(("~".join([reason,str(intTime()),str(datetime.datetime.now()),str(id), str(mid), fields])).encode("utf8"))
-                f.write(b"\n")
+                writer.writerow([reason,str(intTime()),str(datetime.datetime.now()),str(id), str(mid)]+fields)
 
 
 AnkiQt.onRemNotes = onRemNotes

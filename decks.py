@@ -2,6 +2,8 @@ from .debug import debug
 from anki.consts import *
 from anki.decks import DeckManager
 def rem(self, did, cardsToo=False, childrenToo=True):
+        #difference:simplifying a little bit the code
+        # adding a reason to remCards
         debug("rem")
         """Remove the deck whose id is did.
 
@@ -14,13 +16,13 @@ def rem(self, did, cardsToo=False, childrenToo=True):
         cardsToo -- if set to true, delete its card.
         ChildrenToo -- if set to false,
         """
-        deck = self.get(did)
-        dname = deck.get('name')
+        deck = self.get(did)#new
+        dname = deck.get('name')# new
         if str(did) == '1':
             # we won't allow the default deck to be deleted, but if it's a
             # child of an existing deck then it needs to be renamed
-            if '::' in dname:
-                base = dname.split("::")[-1]
+            if '::' in dname:#changed: used dname instead of deck['name']
+                base = dname.split("::")[-1]#changed: used dname instead of deck['name']
                 suffix = ""
                 while True:
                     # find an unused name
@@ -34,7 +36,7 @@ def rem(self, did, cardsToo=False, childrenToo=True):
         # log the removal regardless of whether we have the deck or not
         self.col._logRem([did], REM_DECK)
         # do nothing else if doesn't exist
-        if deck is None:
+        if deck is None:# simplifying the condition since deck was already found
             return
         if deck['dyn']:
             # deleting a cramming deck returns cards to their previous deck
@@ -54,7 +56,7 @@ def rem(self, did, cardsToo=False, childrenToo=True):
                 # don't use cids(), as we want cards in cram decks too
                 cids = self.col.db.list(
                     "select id from cards where did=? or odid=?", did, did)
-                self.col.remCards(cids,reason=f"The last card of this note was in deck {did}:{dname}, which got deleted.")
+                self.col.remCards(cids,reason=f"The last card of this note was in deck {did}:{dname}, which got deleted.") # adding reason
         # delete the deck and add a grave (it seems no grave is added)
         del self.decks[str(did)]
         # ensure we have an active deck.

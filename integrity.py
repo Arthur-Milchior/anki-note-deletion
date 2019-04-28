@@ -75,7 +75,7 @@ select id from cards where nid not in (select id from notes)""")
             problems.append(
                 ngettext("Deleted %d card with missing note.",
                          "Deleted %d cards with missing note.", cnt) % cnt)
-            self.remCards(ids,"Cards {ids} removed because of missing notes.")
+            self.remCards(ids, reason="Cards {ids} removed because of missing notes.")
         # cards with odue set when it shouldn't be
         ids = self.db.list("""
 select id from cards where odue > 0 and (type=1 or queue=2) and not odid""")

@@ -5,7 +5,6 @@ from anki.utils import intTime, ids2str
 from anki.models import ModelManager
 
 def remCards(self, ids, notes=True, reason=None):
-        debug("remCards")
         """Bulk delete cards by ID.
 
         keyword arguments:
@@ -28,7 +27,6 @@ _Collection.remCards=remCards
 
 
 def _changeCards(self, nids, oldModel, newModel, map):
-        debug("_changeCards")
         """Change the note whose ids are nid to the model newModel, reorder
         fields according to map. Write the change in the database
 

@@ -1,9 +1,8 @@
-from anki.models import ModelManager
+from anki.models import *
 from anki.utils import intTime
 
 
 def rem(self, m):
-        debug("rem")
         "Delete model, and all its cards/notes."
         self.col.modSchema(check=True)
         current = self.current()['id'] == m['id']
@@ -20,7 +19,6 @@ select id from cards where nid in (select id from notes where mid = ?)""",
             self.setCurrent(list(self.models.values())[0])
 ModelManager.rem = rem
 def remTemplate(self, m, template):
-        debug("remTemplate")
         "False if removing template would leave orphan notes."
         assert len(m['tmpls']) > 1
         # find cards using this template
