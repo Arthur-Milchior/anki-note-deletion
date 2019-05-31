@@ -92,25 +92,25 @@ those three add-ons
 
 ## Internal
 This add-on redefine the following methods:
-* In ```anki.collection```: ```_Collection._remNotes```,
-  ```_Collection.fixIntegrity```, ```_Collection.remCards```,
-  ```remNotes```,
-* In ```aqt.AddCards```: ```AddCards.removeTempNote```,
-* In ```anki.sync```: ```Syncer.remove```,
-* In ```anki.models```: ```ModelManager.rem```,
-  ```ModelManager.remTemplate```, ```_changeCards```
-* In ```anki.decks```: ```DeckManager.rem```
-* In ```aqt.reviewer```: ```Reviewer.onDelet```
-* In ```aqt.browser```: ```Browser._deleteNotes```
-* In ```aqt.main```: ```AnkiQt.BackupThread.onRemNotes```
+* In `anki.collection`: `_Collection._remNotes`,
+  `_Collection.fixIntegrity`, `_Collection.remCards`,
+  `remNotes`,
+* In `aqt.AddCards`: `AddCards.removeTempNote`,
+* In `anki.sync`: `Syncer.remove`,
+* In `anki.models`: `ModelManager.rem`,
+  `ModelManager.remTemplate`, `_changeCards`
+* In `anki.decks`: `DeckManager.rem`
+* In `aqt.reviewer`: `Reviewer.onDelet`
+* In `aqt.browser`: `Browser._deleteNotes`
+* In `aqt.main`: `AnkiQt.BackupThread.onRemNotes`
 
 ## Version 2.0
 It won't be updated. It add only a single more column, with the
 reason. And it's less precise. It also only update
-```_Collection._remNotes``` and the methods calling it, this
-```_Collection._remNotes```, i.e. _Collection.remCards,
-```_Collection.fixIntegrity```, ```Syncer.remove``` and
-```AddCards.removeTempNote```.
+`_Collection._remNotes` and the methods calling it, this
+`_Collection._remNotes`, i.e. _Collection.remCards,
+`_Collection.fixIntegrity`, `Syncer.remove` and
+`AddCards.removeTempNote`.
 
 ## Todo
 May be allow to use configuration to decide which note to use, which
