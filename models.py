@@ -17,6 +17,7 @@ select id from cards where nid in (select id from notes where mid = ?)""",
         # GUI should ensure last model is not deleted
         if current:
             self.setCurrent(list(self.models.values())[0])
+
 ModelManager.rem = rem
 def remTemplate(self, m, template):
         "False if removing template would leave orphan notes."
